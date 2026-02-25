@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: [],
     },
-    sitemap: "https://repair-copilot.vercel.app/sitemap.xml",
+    sitemap: "https://repair-copilot-app.vercel.app/sitemap.xml",
   };
 }

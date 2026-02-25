@@ -1,5 +1,7 @@
 import { formatDateFR } from "./warranty-calculator";
 
+export type MailTone = "poli" | "standard" | "ferme";
+
 export interface MailFormData {
   applianceType: string;
   brand: string;
@@ -8,6 +10,7 @@ export interface MailFormData {
   problemDescription: string;
   hasReceipt: boolean;
   customerName: string;
+  tone: MailTone;
 }
 
 export interface GeneratedMail {
@@ -16,19 +19,91 @@ export interface GeneratedMail {
   type: "reclamation" | "relance";
 }
 
+export const toneLabels: Record<MailTone, { label: string; description: string }> = {
+  poli: {
+    label: "Poli",
+    description: "Ton courtois et diplomate. Idéal pour un premier contact.",
+  },
+  standard: {
+    label: "Standard",
+    description: "Ton professionnel et direct. Cite les articles de loi.",
+  },
+  ferme: {
+    label: "Ferme",
+    description: "Ton assertif avec mention de recours. Pour les cas urgents.",
+  },
+};
+
 /**
- * Génère un mail de réclamation pour faire valoir la garantie légale
- * de conformité auprès du vendeur.
+ * Génère un mail de réclamation avec le ton choisi.
  */
 export function generateReclamationMail(data: MailFormData): GeneratedMail {
   const purchaseDate = new Date(data.purchaseDate);
   const formattedDate = formatDateFR(purchaseDate);
+  const storeType = getStoreType(data.store);
 
   const subject = `Réclamation au titre de la garantie légale de conformité — ${data.applianceType} ${data.brand}`;
 
-  const body = `Madame, Monsieur,
+  let body: string;
 
-Je me permets de vous contacter au sujet d'un ${data.applianceType.toLowerCase()} de marque ${data.brand} que j'ai acheté dans votre ${getStoreType(data.store)} le ${formattedDate}.
+  switch (data.tone) {
+    case "poli":
+      body = `Madame, Monsieur,
+
+Je me permets de vous contacter au sujet d'un ${data.applianceType.toLowerCase()} de marque ${data.brand} que j'ai acheté dans votre ${storeType} le ${formattedDate}.
+
+Malheureusement, cet appareil présente depuis peu le dysfonctionnement suivant :
+${data.problemDescription}
+
+Ce problème est apparu dans le cadre d'une utilisation tout à fait normale de l'appareil.
+
+Je me permets de vous rappeler que, selon les articles L217-3 et suivants du Code de la consommation, le vendeur est tenu de délivrer un bien conforme au contrat. Les défauts apparaissant dans les 24 mois suivant l'achat sont présumés exister dès la délivrance (article L217-7).
+
+Aussi, je vous serais reconnaissant(e) de bien vouloir organiser la réparation ou, si cela n'est pas possible, le remplacement de cet appareil, conformément à l'article L217-8 du Code de la consommation.
+
+${data.hasReceipt ? "Je tiens la facture d'achat à votre disposition." : "Je suis en mesure de justifier de la date d'achat par tout moyen (relevé bancaire, confirmation de commande, etc.)."}
+
+En vous remerciant par avance pour votre diligence, je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+
+${data.customerName}`;
+      break;
+
+    case "ferme":
+      body = `Madame, Monsieur,
+
+Par la présente, je vous informe que le ${data.applianceType.toLowerCase()} de marque ${data.brand}, acheté dans votre ${storeType} le ${formattedDate}, présente un défaut de conformité.
+
+Le dysfonctionnement constaté est le suivant :
+${data.problemDescription}
+
+Ce défaut est apparu dans le cadre d'une utilisation normale et rend l'appareil impropre à l'usage auquel il est destiné.
+
+Je vous rappelle vos obligations légales au titre de la garantie légale de conformité :
+— Article L217-3 : le vendeur délivre un bien conforme et répond des défauts de conformité.
+— Article L217-7 : les défauts apparaissant dans les 24 mois sont présumés exister dès la délivrance. La charge de la preuve est inversée : c'est à vous de prouver le contraire.
+— Article L217-8 : le consommateur choisit entre réparation et remplacement.
+— Article L217-10 : la mise en conformité doit intervenir sous 30 jours maximum.
+— Article L217-11 : sans aucun frais pour le consommateur (pièces, main d'œuvre, déplacement, port).
+
+En conséquence, je vous mets en demeure de procéder à la réparation ou au remplacement de cet appareil dans un délai de 30 jours à compter de la réception de ce courrier.
+
+À défaut, je me réserve le droit de :
+— Saisir le médiateur de la consommation de votre secteur.
+— Contacter une association de défense des consommateurs (UFC-Que Choisir, CLCV).
+— Demander une réduction du prix ou la résolution du contrat conformément à l'article L217-12.
+— Engager toute procédure judiciaire utile.
+
+${data.hasReceipt ? "La facture d'achat est à votre disposition sur simple demande." : "Je dispose de justificatifs de la date d'achat (relevé bancaire, confirmation de commande)."}
+
+Veuillez agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+
+${data.customerName}`;
+      break;
+
+    default: // standard
+      body = `Madame, Monsieur,
+
+Je me permets de vous contacter au sujet d'un ${data.applianceType.toLowerCase()} de marque ${data.brand} que j'ai acheté dans votre ${storeType} le ${formattedDate}.
 
 Depuis peu, cet appareil présente le dysfonctionnement suivant :
 ${data.problemDescription}
@@ -48,13 +123,14 @@ ${data.hasReceipt ? "Je tiens à votre disposition la facture d'achat correspond
 Dans l'attente de votre réponse, que j'espère rapide, je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
 
 ${data.customerName}`;
+      break;
+  }
 
   return { subject, body, type: "reclamation" };
 }
 
 /**
- * Génère un mail de relance si le vendeur n'a pas répondu
- * dans un délai raisonnable.
+ * Génère un mail de relance (toujours ferme).
  */
 export function generateRelanceMail(data: MailFormData): GeneratedMail {
   const purchaseDate = new Date(data.purchaseDate);
@@ -92,16 +168,8 @@ ${data.customerName}`;
  */
 function getStoreType(store: string): string {
   const onlineStores = [
-    "amazon",
-    "cdiscount",
-    "fnac",
-    "darty",
-    "boulanger",
-    "ldlc",
-    "rue du commerce",
-    "rakuten",
-    "back market",
-    "ebay",
+    "amazon", "cdiscount", "fnac", "darty", "boulanger",
+    "ldlc", "rue du commerce", "rakuten", "back market", "ebay",
   ];
 
   const lowerStore = store.toLowerCase().trim();
@@ -148,23 +216,13 @@ export const applianceTypes = [
 ];
 
 /**
- * Liste des enseignes courantes en France
+ * Pièces à joindre recommandées selon la situation
  */
-export const commonStores = [
-  "Amazon",
-  "Fnac",
-  "Darty",
-  "Boulanger",
-  "Cdiscount",
-  "Carrefour",
-  "Leclerc",
-  "Auchan",
-  "Conforama",
-  "But",
-  "LDLC",
-  "Rue du Commerce",
-  "Back Market",
-  "Samsung",
-  "Apple Store",
-  "Xiaomi",
+export const recommendedAttachments = [
+  { id: "facture", label: "Facture ou ticket de caisse", always: true },
+  { id: "photos", label: "Photos du défaut / de la panne", always: true },
+  { id: "releve", label: "Relevé bancaire (si pas de facture)", always: false },
+  { id: "confirmation", label: "Confirmation de commande (achat en ligne)", always: false },
+  { id: "echanges", label: "Captures d'écran des échanges précédents", always: false },
+  { id: "garantie", label: "Certificat de garantie commerciale (si disponible)", always: false },
 ];

@@ -9,32 +9,37 @@ const inter = Inter({
   display: "swap",
 });
 
+const baseUrl = "https://repair-copilot-app.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: {
-    default: "Repair Copilot — Faites valoir votre garantie en 30 secondes",
+    default:
+      "Repair Copilot — Mail de réclamation garantie gratuit en 30 secondes",
     template: "%s | Repair Copilot",
   },
   description:
-    "Votre appareil est en panne ? Découvrez vos droits de garantie et générez un mail de réclamation professionnel gratuit en 30 secondes. Garantie légale de conformité, Code de la consommation.",
+    "Appareil en panne ? Vérifiez gratuitement votre garantie légale de conformité (2 ans) et générez un mail de réclamation professionnel avec les articles de loi. Sans inscription, sans frais.",
   keywords: [
-    "garantie légale",
+    "garantie légale conformité",
     "réclamation garantie",
-    "appareil en panne",
-    "garantie conformité",
-    "lettre réclamation",
-    "mail garantie",
-    "droit consommateur",
-    "électroménager panne",
-    "réparation garantie",
+    "appareil en panne garantie",
+    "lettre réclamation garantie",
+    "mail garantie légale",
+    "droit consommateur panne",
+    "électroménager en panne que faire",
+    "modèle courrier garantie",
+    "garantie 2 ans",
+    "article L217-3",
   ],
   authors: [{ name: "Repair Copilot" }],
   openGraph: {
     type: "website",
     locale: "fr_FR",
     siteName: "Repair Copilot",
-    title: "Repair Copilot — Faites valoir votre garantie en 30 secondes",
+    title: "Repair Copilot — Mail de réclamation garantie gratuit",
     description:
-      "Votre appareil est en panne ? Générez un mail de réclamation professionnel gratuit basé sur vos droits de garantie.",
+      "Appareil en panne ? Générez un mail de réclamation professionnel gratuit avec les articles de loi en 30 secondes.",
   },
   robots: {
     index: true,
