@@ -38,10 +38,15 @@ export default function WarrantyStatus({ status }: WarrantyStatusProps) {
           >
             {status.isUnderWarranty
               ? status.daysRemaining > 30
-                ? "Garantie légale probablement active"
-                : "Garantie légale bientôt expirée"
-              : "Garantie légale probablement expirée"}
+                ? "Probablement couvert par la garantie légale"
+                : "Garantie légale bientôt à échéance"
+              : "Garantie probablement expirée"}
           </h3>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {status.isUnderWarranty
+              ? "(estimation indicative)"
+              : "(à vérifier selon votre situation)"}
+          </p>
           <p
             className={`mt-2 text-sm leading-relaxed ${
               status.isUnderWarranty
@@ -77,8 +82,9 @@ export default function WarrantyStatus({ status }: WarrantyStatusProps) {
             )}
           </div>
           <p className="mt-3 text-xs text-gray-500 italic">
-            Ce calcul est indicatif, basé sur la date d&apos;achat que vous avez
-            renseignée. La date de délivrance effective du bien peut varier.
+            Estimation indicative basée sur la date d&apos;achat. La date de
+            délivrance effective du bien peut varier. En cas de doute,
+            consultez un professionnel du droit.
           </p>
         </div>
       </div>

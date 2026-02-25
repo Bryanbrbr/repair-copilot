@@ -112,19 +112,27 @@ export default function MailPreview({ mail }: MailPreviewProps) {
       </div>
 
       {/* Actions */}
-      <div className="px-6 py-4 bg-gray-50 border-t border-[var(--color-border)] flex flex-col sm:flex-row gap-3">
+      <div className="px-6 py-4 bg-gray-50 border-t border-[var(--color-border)] flex flex-col gap-3">
         <button
-          onClick={handleCopyBody}
-          className="flex-1 bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-light)] text-white font-medium py-3 px-6 rounded-lg transition-colors text-center"
+          onClick={handleCopyAll}
+          className="w-full bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-light)] text-white font-semibold py-4 px-6 rounded-xl transition-colors text-center text-lg shadow-lg hover:shadow-xl"
         >
-          {copied ? "✓ Mail copié !" : "📋 Copier le mail"}
+          {copied ? "✓ Lettre copiée !" : "📋 Copier la lettre"}
         </button>
-        <a
-          href={`mailto:?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`}
-          className="flex-1 bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] text-white font-medium py-3 px-6 rounded-lg transition-colors text-center"
-        >
-          📧 Ouvrir dans ma messagerie
-        </a>
+        <div className="flex gap-3">
+          <button
+            onClick={handleCopyBody}
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-[var(--color-text)] font-medium py-3 px-4 rounded-lg transition-colors text-center text-sm"
+          >
+            {copied ? "✓ Copié" : "Copier le corps seul"}
+          </button>
+          <a
+            href={`mailto:?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`}
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-[var(--color-text)] font-medium py-3 px-4 rounded-lg transition-colors text-center text-sm"
+          >
+            📧 Ouvrir dans ma messagerie
+          </a>
+        </div>
       </div>
 
       {/* Conseil */}

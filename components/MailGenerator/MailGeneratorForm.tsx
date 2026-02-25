@@ -117,15 +117,24 @@ export default function MailGeneratorForm() {
 
   const today = new Date().toISOString().split("T")[0];
 
+  const isStep1Complete =
+    formData.applianceType !== "" &&
+    formData.brand.trim() !== "" &&
+    formData.purchaseDate !== "" &&
+    formData.store.trim() !== "" &&
+    formData.customerName.trim() !== "";
+
+  const isStep2Complete = formData.problemDescription.trim().length >= 20;
+
   return (
     <div className="space-y-6">
       {/* Step Indicator */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8" role="navigation" aria-label="Étapes du formulaire">
         {([1, 2, 3] as Step[]).map((step) => (
           <div key={step} className="flex-1 flex items-center">
             <div className="flex flex-col items-center flex-1">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
                   step < currentStep
                     ? "bg-[var(--color-secondary)] text-white"
                     : step === currentStep
@@ -136,7 +145,7 @@ export default function MailGeneratorForm() {
                 {step < currentStep ? "✓" : step}
               </div>
               <span
-                className={`text-xs mt-2 text-center font-medium ${
+                className={`text-[10px] sm:text-xs mt-1.5 sm:mt-2 text-center font-medium leading-tight ${
                   step === currentStep
                     ? "text-[var(--color-primary)]"
                     : step < currentStep
@@ -149,7 +158,7 @@ export default function MailGeneratorForm() {
             </div>
             {step < 3 && (
               <div
-                className={`h-0.5 w-full mx-2 mt-[-16px] ${
+                className={`h-0.5 w-full mx-1 sm:mx-2 mt-[-16px] ${
                   step < currentStep ? "bg-[var(--color-secondary)]" : "bg-gray-200"
                 }`}
               />
@@ -257,7 +266,12 @@ export default function MailGeneratorForm() {
 
           <button
             type="button" onClick={handleNextStep}
-            className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] text-white text-lg font-semibold py-4 px-8 rounded-xl transition-colors"
+            disabled={!isStep1Complete}
+            className={`w-full text-lg font-semibold py-4 px-8 rounded-xl transition-colors ${
+              isStep1Complete
+                ? "bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] text-white"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
           >
             Continuer — Étape 2 →
           </button>
@@ -362,7 +376,12 @@ export default function MailGeneratorForm() {
             </button>
             <button
               type="button" onClick={handleNextStep}
-              className="flex-[2] bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-light)] text-white text-lg font-semibold py-4 px-8 rounded-xl transition-colors shadow-lg hover:shadow-xl"
+              disabled={!isStep2Complete}
+              className={`flex-[2] text-lg font-semibold py-4 px-8 rounded-xl transition-colors ${
+                isStep2Complete
+                  ? "bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-light)] text-white shadow-lg hover:shadow-xl"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
             >
               🔧 Générer mon mail
             </button>
